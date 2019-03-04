@@ -31,13 +31,14 @@ namespace Client
                 stream.Write(Encoding.ASCII.GetBytes(message), 0, message.Length);
                 Console.WriteLine("Ecuation {0} was sent to the server for processing.", message);
 
-                var receivedData = new byte[1024];
+                byte[] receivedData = new byte[1024];
 
-                var response = stream.Read(receivedData, 0, receivedData.Length);
+                int response = stream.Read(receivedData, 0, receivedData.Length);
 
-                var receivedMessage = Encoding.ASCII.GetString(receivedData, 0, response);
+                string receivedMessage = Encoding.ASCII.GetString(receivedData, 0, response);
 
-                Console.WriteLine("Answer = {0}", receivedMessage);
+                Console.WriteLine("Answer: {0}", receivedMessage);
+                Console.WriteLine();
 
             }
 

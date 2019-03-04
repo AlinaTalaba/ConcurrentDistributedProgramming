@@ -23,7 +23,7 @@ namespace Server
                 server.Start();
 
                 Byte[] readingBytes = new Byte[256];
-                String receivedEcuation = null;
+                String receivedMessage = null;
 
                 while (true)
                 {
@@ -32,7 +32,7 @@ namespace Server
                     TcpClient client = server.AcceptTcpClient();
                     Console.WriteLine("Client connected!");
 
-                    receivedEcuation = null;
+                    receivedMessage = null;
 
                     NetworkStream stream = client.GetStream();
 
@@ -40,55 +40,67 @@ namespace Server
 
                     while((i = stream.Read(readingBytes, 0, readingBytes.Length)) != 0)
                     {
-                        receivedEcuation = System.Text.Encoding.ASCII.GetString(readingBytes, 0, i);
+                        receivedMessage = System.Text.Encoding.ASCII.GetString(readingBytes, 0, i);
 
-                        receivedEcuation = receivedEcuation.ToUpper();
+                        receivedMessage = receivedMessage.ToUpper();
 
-                        if (receivedEcuation != "EXIT")
+                        if (receivedMessage != "EXIT")
                         {
-                            Console.WriteLine("Ecuation Received: {0}", receivedEcuation);
+                            Console.WriteLine("Ecuation Received: {0}", receivedMessage);
 
                             int result = 0;
                             byte[] msg;
-                            string[] ecuationElements = receivedEcuation.Split(' ');
+                            string[] ecuationElements = receivedMessage.Split(' ');
 
                             if (ecuationElements.Length == 3) {
-                                int operand1 = int.Parse(ecuationElements[0]);
-                                string operation = ecuationElements[1];
-                                int operand2 = int.Parse(ecuationElements[2]);
-
-                                switch (operation)
+                                try
                                 {
-                                    case "+":
-                                        result = operand1 + operand2;
-                                        break;
-                                    case "-":
-                                        result = operand1 - operand2;
-                                        break;
-                                    case "*":
-                                        result = operand1 * operand2;
-                                        break;
-                                    case "/":
-                                        if (operand2 != 0)
-                                        {
-                                            result = operand1 / operand2;
-                                        }
-                                        else
-                                        {
-                                            result = 0;
-                                        }
-                                        break;
-                                }
+                                    int operand1 = int.Parse(ecuationElements[0]);
+                                    string operation = ecuationElements[1];
+                                    int operand2 = int.Parse(ecuationElements[2]);
 
-                                msg = System.Text.Encoding.ASCII.GetBytes(result.ToString());
-                                Console.WriteLine("Sending the result: {0}", result.ToString());
+                                    switch (operation)
+                                    {
+                                        case "+":
+                                            result = operand1 + operand2;
+                                            break;
+                                        case "-":
+                                            result = operand1 - operand2;
+                                            break;
+                                        case "*":
+                                            result = operand1 * operand2;
+                                            break;
+                                        case "/":
+                                            if (operand2 != 0)
+                                            {
+                                                result = operand1 / operand2;
+                                            }
+                                            else
+                                            {
+                                                result = 0;
+                                            }
+                                            break;
+                                    }
+
+                                    msg = System.Text.Encoding.ASCII.GetBytes(result.ToString());
+                                    Console.WriteLine("Sending the result: {0}", result.ToString());
+                                    Console.WriteLine();
+                                }
+                                catch(Exception ex)
+                                {
+                                    msg = System.Text.Encoding.ASCII.GetBytes("Invalid Input! Try again.");
+                                    Console.WriteLine("Sending the result: Invalid Input! Try again.");
+                                    Console.WriteLine();
+                                }
+                                
                             }
                             else
                             {
                                 msg = System.Text.Encoding.ASCII.GetBytes("Invalid Input! Try again.");
                                 Console.WriteLine("Sending the result: Invalid Input! Try again.");
+                                Console.WriteLine();
                             }
-          
+
                             stream.Write(msg, 0, msg.Length);
                         }
                         else
